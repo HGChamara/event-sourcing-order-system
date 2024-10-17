@@ -10,19 +10,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/order")
+@RequestMapping("api/orders")
 public class OrderController {
 
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {this.orderService = orderService;}
 
-    @PostMapping()
+    @PostMapping("/a")
     public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest) {
         try {
             OrderResponse response = orderService.placeOrder(orderRequest);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
+            e.printStackTrace();
             return  new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
