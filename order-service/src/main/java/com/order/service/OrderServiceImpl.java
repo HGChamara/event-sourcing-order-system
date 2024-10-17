@@ -19,14 +19,20 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderEventPublisher publisher;
     public OrderResponse placeOrder(OrderRequest request) {
-
-        OrderEvent event = new OrderEvent(UUID.randomUUID(), OrderStatus.CREATED, "Order placed", LocalDateTime.now());
-        OrderEvent createdEvent = orderRepository.save(event);
-        publisher.sendOrderEvent(event);
-        return new OrderResponse(createdEvent.getId(), OrderStatus.CREATED);
+        UUID orderId = UUID.randomUUID();
+        OrderEvent event = new OrderEvent(orderId, OrderStatus.CREATED, "Order placed", LocalDateTime.now());
+        saveAndPublishEvents(event);
+        return new OrderResponse(orderId, OrderStatus.CREATED);
     }
 
     public OrderResponse confirmOrder(UUID orderId) {
+        OrderEvent event = new OrderEvent(orderId, OrderStatus.CONFIRMED, "Order confirmed", LocalDateTime.now());
+        saveAndPublishEvents(event);
         return new OrderResponse(orderId, OrderStatus.CONFIRMED);
+    }
+
+    private void saveAndPublishEvents(OrderEvent event) {
+        orderRepository.save(event);
+        publisher.sendOrderEvent(event);
     }
 }
